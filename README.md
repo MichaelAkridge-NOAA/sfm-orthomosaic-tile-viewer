@@ -124,7 +124,7 @@ uvicorn main:app --reload
 │  (Web Viewer)   │
 └─────────────────┘
 ```
-### Step 1: Convert Orthomosaics to COG Format
+### Step 1: Convert Orthomosaics to COG Format (or Use Web App)
 
 Transform your SfM-generated orthomosaics into Cloud Optimized GeoTIFFs for efficient web viewing.
 
@@ -196,14 +196,14 @@ Navigate to `http://localhost:8000/` in your browser. The viewer will automatica
 - Load and zoom to the first available orthomosaic
 
 **Viewer Features:**
-- � Clean, focused interface for orthomosaic viewing
-- 🔽 Dropdown selector for multiple orthomosaics
-- 🎛️ Opacity slider for transparency control
-- 📊 Raster metadata display (bands, data type, dimensions)
-- 🔄 Dynamic loading without page refresh
-- 📏 Scale bar (metric/imperial) and zoom-to-fit controls
-- 🎯 Max zoom level of 2000 for detailed inspection
-- 🌑 Dark background for better image contrast
+- Clean, focused interface for orthomosaic viewing
+- Dropdown selector for multiple orthomosaics
+- Opacity slider for transparency control
+- Raster metadata display (bands, data type, dimensions)
+- Dynamic loading without page refresh
+- Scale bar (metric/imperial) and zoom-to-fit controls
+- Max zoom level of 2000 for detailed inspection
+- Dark background for better image contrast
 
 **Adding More Orthomosaics:**
 Simply place COG files in the `data/` directory with "cog" in the filename (e.g., `my_ortho_cog.tif`). They will automatically appear in the dropdown selector.
