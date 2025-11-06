@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Orthomosaic Viewer</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #2c2c2c;
+    }
+    .navbar {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 2000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .navbar h1 {
+      margin: 0;
+      font-size: 18px;
+      color: #333;
+    }
+    .nav-links a {
+      color: #667eea;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover {
+      color: #764ba2;
+    }
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100vh;
+      background: #2c2c2c;
+    }
+    .control-panel {
+      position: absolute;
+      top: 120px;
+      right: 10px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      max-width: 300px;
+      max-height: calc(90vh - 130px);
+      overflow-y: auto;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .control-panel.hidden {
+      display: none;
+    }
+    .control-panel h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+      color: #333;
+    }
+    .control-section {
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    .control-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    .control-section label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 13px;
+      color: #666;
+      font-weight: 500;
+    }
+    .control-section input[type="text"],
+    .control-section input[type="number"],
+    .control-section select {
+      width: 100%;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+    .control-section input[type="range"] {
+      width: 100%;
+    }
+    .slider-value {
+      display: inline-block;
+      margin-left: 10px;
+      font-weight: bold;
+      color: #0066cc;
+    }
+    .button-group {
+      display: flex;
+      gap: 5px;
+      margin-top: 8px;
+    }
+    .btn {
+      flex: 1;
+      padding: 8px 12px;
+      background: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background: #0052a3;
+    }
+    .btn-secondary {
+      background: #6c757d;
+    }
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+    .btn-success {
+      background: #28a745;
+    }
+    .btn-success:hover {
+      background: #218838;
+    }
+    .info-box {
+      background: #f8f9fa;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+    }
+    .info-box strong {
+      color: #333;
+    }
+    .status {
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .status.loading {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+    .toggle-panel {
+      position: absolute;
+      top: 70px;
+      right: 10px;
+      background: white;
+      padding: 10px 15px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 1001;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      transition: all 0.3s;
+    }
+    .toggle-panel:hover {
+      background: #667eea;
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    .coords-display {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      z-index: 1000;
+      font-family: monospace;
+    }
+    /* Adjust Leaflet zoom controls position */
+    .leaflet-top.leaflet-left {
+      top: 70px;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .modal-content h2 {
+      margin: 0 0 15px 0;
+      color: #333;
+      font-size: 24px;
+    }
+    .modal-content p {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .modal-actions .btn {
+      padding: 12px 24px;
+      text-decoration: none;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <h1>📷 Orthomosaic Viewer</h1>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/converter">Converter</a>
+      <a href="/docs">API Docs</a>
+    </div>
+  </nav>
+  
+  <div id="map"></div>
+  
+  <div class="toggle-panel" onclick="togglePanel()">☰ Controls</div>
+  
+  <div class="control-panel" id="controlPanel">
+    <h3>� Orthomosaic Viewer</h3>
+    
+    <div id="statusMessage"></div>
+    
+    <div class="control-section">
+      <label>Select Orthomosaic:</label>
+      <select id="rasterSelect" onchange="loadSelectedRaster()">
+        <option value="2025_GUA-2838_mos_cog.tif">2025_GUA-2838_mos_cog.tif</option>
+      </select>
+      <div class="button-group">
+        <button class="btn btn-success" onclick="zoomToRaster()">Zoom to Fit</button>
+      </div>
+    </div>
+    
+    <div class="control-section">
+      <label>Opacity: <span class="slider-value" id="opacityValue">1.0</span></label>
+      <input type="range" id="opacitySlider" min="0" max="1" step="0.05" value="1.0" 
+             oninput="updateOpacity(this.value)" />
+    </div>
+    
+    <div class="control-section" id="colormapGroup" style="display: none;">
+      <label>DEM Colormap:</label>
+      <select id="colormapSelect" onchange="updateColormap()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+        <option value="viridis" selected>Viridis</option>
+        <option value="terrain">Terrain (Land)</option>
+        <option value="ocean">Ocean (Bathymetry)</option>
+        <option value="deep">Deep Ocean</option>
+        <option value="plasma">Plasma</option>
+        <option value="inferno">Inferno</option>
+        <option value="cividis">Cividis</option>
+        <option value="gray">Grayscale</option>
+        <option value="rainbow">Rainbow</option>
+        <option value="turbo">Turbo</option>
+      </select>
+      <p style="font-size: 11px; color: #999; margin: 5px 0 0 0;">💡 Use Ocean/Deep for underwater DEMs</p>
+      
+      <button onclick="updateColormap()" style="width: 100%; padding: 6px; margin-top: 10px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Apply Colormap</button>
+    </div>
+    
+    <div id="rasterInfo" class="info-box" style="display:none;">
+      <strong>Info:</strong><br>
+      <span id="infoContent"></span>
+    </div>
+  </div>
+
+  <script>
+    // Initialize the map with no basemap
+    var map = L.map('map', {
+      center: [0, 0],
+      zoom: 2,
+      zoomControl: true,
+      maxZoom: 2000
+    });
+    
+    // Add scale control
+    L.control.scale({
+      imperial: true,
+      metric: true
+    }).addTo(map);
+    
+    // Server URL (fixed)
+    var serverUrl = 'http://localhost:8000';
+    
+    // Raster layer
+    var rasterLayer = null;
+    var rasterBounds = null;
+    
+    // Available orthomosaics (loaded from server)
+    var availableRasters = [];
+    
+    // Show status message
+    function showStatus(message, type) {
+      var statusDiv = document.getElementById('statusMessage');
+      statusDiv.className = 'status ' + type;
+      statusDiv.textContent = message;
+      statusDiv.style.display = 'block';
+      
+      if (type === 'success') {
+        setTimeout(() => {
+          statusDiv.style.display = 'none';
+        }, 3000);
+      }
+    }
+    
+    // Load selected raster from dropdown
+    function loadSelectedRaster() {
+      var rasterPath = document.getElementById('rasterSelect').value;
+      loadRaster(rasterPath);
+    }
+    
+    // Load raster
+    async function loadRaster(rasterPath) {
+      if (!rasterPath) {
+        rasterPath = document.getElementById('rasterSelect').value;
+      }
+      
+      showStatus('Loading orthomosaic...', 'loading');
+      
+      // Remove existing raster layer
+      if (rasterLayer) {
+        map.removeLayer(rasterLayer);
+      }
+      
+      try {
+        // First, check if it's single-band (DEM) to apply appropriate rendering
+        var infoUrl = serverUrl + '/info?url=' + encodeURIComponent(rasterPath);
+        var infoResponse = await fetch(infoUrl);
+        var info = await infoResponse.json();
+        var bandCount = info.band_descriptions?.length || info.count || 3;
+        
+        // Create base tile URL
+        var titilerUrl = serverUrl + '/tiles/WebMercatorQuad/{z}/{x}/{y}.png?url=' + encodeURIComponent(rasterPath);
+        var isBathymetric = false;
+        var colormap = null;
+        
+        // For single-band data (DEMs), add colormap for better visualization
+        if (bandCount === 1) {
+          colormap = document.getElementById('colormapSelect').value;
+          
+          // For single-band, specify the band index
+          titilerUrl += '&bidx=1';
+          
+          // Fetch statistics to get proper rescale values
+          try {
+            var statsUrl = serverUrl + '/statistics?url=' + encodeURIComponent(rasterPath);
+            var statsResponse = await fetch(statsUrl);
+            var stats = await statsResponse.json();
+            
+            console.log('Full statistics response:', stats);
+            
+            // Handle different statistics response formats
+            var bandStats = stats.b1 || stats['1'] || (stats.statistics && stats.statistics[0]) || {};
+            
+            // Use percentiles if available (more robust than min/max with outliers)
+            var min = bandStats.percentile_2 || bandStats.min;
+            var max = bandStats.percentile_98 || bandStats.max;
+            
+            console.log('Band statistics:', bandStats);
+            console.log('Using rescale:', min, 'to', max);
+            
+            // Auto-detect bathymetric (underwater) DEMs based on negative values
+            isBathymetric = max < 0;
+            
+            // For single-band with colormap, add both colormap_name and rescale
+            titilerUrl += '&colormap_name=' + colormap;
+            if (min !== undefined && max !== undefined && !isNaN(min) && !isNaN(max)) {
+              // Round to avoid precision issues
+              var rescaleMin = Math.round(min * 100) / 100;
+              var rescaleMax = Math.round(max * 100) / 100;
+              titilerUrl += '&rescale=' + rescaleMin + ',' + rescaleMax;
+              console.log('Applied rescale:', rescaleMin, 'to', rescaleMax);
+            } else {
+              console.warn('Invalid rescale values, using colormap only');
+            }
+          } catch (error) {
+            console.warn('Could not fetch statistics, using colormap without rescale:', error);
+            titilerUrl += '&colormap_name=' + colormap;
+          }
+          
+          document.getElementById('colormapGroup').style.display = 'block';
+        } else {
+          document.getElementById('colormapGroup').style.display = 'none';
+        }
+        
+        // Add new raster layer
+        rasterLayer = L.tileLayer(titilerUrl, {
+          tileSize: 256,
+          opacity: parseFloat(document.getElementById('opacitySlider').value),
+          maxZoom: 2000
+        }).addTo(map);
+        
+        // Display info
+        var infoText = `Bands: ${bandCount}<br>`;
+        infoText += `Data Type: ${info.dtype || 'N/A'}<br>`;
+        infoText += `Width: ${info.width || 'N/A'}, Height: ${info.height || 'N/A'}`;
+        if (bandCount === 1 && colormap) {
+          var demType = isBathymetric ? 'Bathymetric DEM' : 'DEM';
+          infoText += `<br><span style="color: #667eea;">ℹ ${demType} - Using ${colormap} colormap</span>`;
+          infoText += `<br><span style="font-size: 11px; color: #999;">Tile URL: ${titilerUrl.substring(0, 100)}...</span>`;
+        }
+        document.getElementById('infoContent').innerHTML = infoText;
+        document.getElementById('rasterInfo').style.display = 'block';
+        
+        console.log('Final tile URL:', titilerUrl);
+        
+        // Fetch bounds
+        var boundsUrl = serverUrl + '/bounds?url=' + encodeURIComponent(rasterPath);
+        var boundsResponse = await fetch(boundsUrl);
+        var boundsData = await boundsResponse.json();
+        
+        if (boundsData && boundsData.bounds) {
+          var b = boundsData.bounds;
+          rasterBounds = [[b[1], b[0]], [b[3], b[2]]];
+          map.fitBounds(rasterBounds, { padding: [50, 50] });
+          showStatus('Orthomosaic loaded successfully!', 'success');
+        }
+      } catch (error) {
+        console.error('Error loading raster:', error);
+        showStatus('Error loading orthomosaic. Check console for details.', 'error');
+      }
+    }
+    
+    // Zoom to raster bounds
+    function zoomToRaster() {
+      if (rasterBounds) {
+        map.fitBounds(rasterBounds, { padding: [50, 50] });
+      } else {
+        showStatus('Load an orthomosaic first', 'error');
+      }
+    }
+    
+    // Update opacity
+    function updateOpacity(value) {
+      document.getElementById('opacityValue').textContent = value;
+      if (rasterLayer) {
+        rasterLayer.setOpacity(parseFloat(value));
+      }
+    }
+    
+    // Update colormap for single-band DEMs
+    function updateColormap() {
+      var select = document.getElementById('rasterSelect');
+      if (select && select.value) {
+        loadRaster(select.value);
+      }
+    }
+    
+    // Toggle control panel
+    function togglePanel() {
+      var panel = document.getElementById('controlPanel');
+      var toggleBtn = document.querySelector('.toggle-panel');
+      
+      if (panel.classList.contains('hidden') || panel.style.display === 'none') {
+        panel.classList.remove('hidden');
+        panel.style.display = 'block';
+        toggleBtn.innerHTML = '✕ Close';
+      } else {
+        panel.classList.add('hidden');
+        panel.style.display = 'none';
+        toggleBtn.innerHTML = '☰ Controls';
+      }
+    }
+    
+    // Fetch available COG files from server
+    function fetchAvailableRasters() {
+      fetch(serverUrl + '/api/cog-files')
+        .then(response => response.json())
+        .then(data => {
+          if (data.files && data.files.length > 0) {
+            availableRasters = data.files.map(f => 'data/' + f);
+            
+            // Sort to prioritize orthomosaics (mos/ortho) over DEMs
+            availableRasters.sort(function(a, b) {
+              var aIsOrtho = /mos|ortho/i.test(a);
+              var bIsOrtho = /mos|ortho/i.test(b);
+              var aIsDEM = /dem|depth|bathy/i.test(a);
+              var bIsDEM = /dem|depth|bathy/i.test(b);
+              
+              // Prioritize orthomosaics first, then DEMs, then others
+              if (aIsOrtho && !bIsOrtho) return -1;
+              if (!aIsOrtho && bIsOrtho) return 1;
+              if (aIsDEM && !bIsDEM) return 1;
+              if (!aIsDEM && bIsDEM) return -1;
+              return a.localeCompare(b);
+            });
+            
+            populateRasterSelector();
+            loadRaster();
+          } else {
+            showNoFilesModal();
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching COG files:', error);
+          showStatus('Error loading COG file list', 'error');
+        });
+    }
+    
+    // Show modal when no COG files are found
+    function showNoFilesModal() {
+      var modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h2>📂 No COG Files Found</h2>
+          <p>The data directory is empty or contains no Cloud Optimized GeoTIFF files.</p>
+          <p><strong>Get started by:</strong></p>
+          <div class="modal-actions">
+            <a href="/converter" class="btn btn-primary">Convert Your Files</a>
+            <a href="/" class="btn btn-secondary">Back to Home</a>
+          </div>
+          <p style="font-size: 12px; margin-top: 20px; color: #999;">
+            Need sample data? Check the README for download instructions.
+          </p>
+        </div>
+      `;
+      
+      // Close modal when clicking outside
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          document.body.removeChild(modal);
+        }
+      });
+      
+      document.body.appendChild(modal);
+    }
+    
+    // Populate raster selector
+    function populateRasterSelector() {
+      var select = document.getElementById('rasterSelect');
+      select.innerHTML = '';
+      
+      if (availableRasters.length === 0) {
+        var option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'No COG files available';
+        select.appendChild(option);
+        return;
+      }
+      
+      availableRasters.forEach(function(raster) {
+        var option = document.createElement('option');
+        option.value = raster;
+        option.textContent = raster.split('/').pop(); // Show only filename
+        select.appendChild(option);
+      });
+    }
+    
+    // Auto-load on page load
+    window.onload = function() {
+      fetchAvailableRasters();
+    };
+  </script>
+</body>
+</html>

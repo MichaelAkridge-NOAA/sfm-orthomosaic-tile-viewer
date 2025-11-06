@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SfM Orthomosaic Viewer</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      width: 100%;
+    }
+    
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 50px;
+    }
+    
+    .header h1 {
+      font-size: 48px;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .header p {
+      font-size: 20px;
+      opacity: 0.9;
+    }
+    
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transition: transform 0.3s, box-shadow 0.3s;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+    
+    .card-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    
+    .card h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    
+    .card p {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    
+    .card .button {
+      display: inline-block;
+      padding: 12px 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+    
+    .card .button:hover {
+      opacity: 0.9;
+    }
+    
+    .features {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 30px;
+      color: white;
+    }
+    
+    .features h3 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    
+    .feature-item {
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+    }
+    
+    .feature-item h4 {
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+    
+    .feature-item p {
+      font-size: 14px;
+      opacity: 0.9;
+      line-height: 1.5;
+    }
+    
+    .footer {
+      text-align: center;
+      color: white;
+      margin-top: 40px;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📷 SfM Orthomosaic Viewer</h1>
+      <p>Visualize and convert large-scale photogrammetry outputs</p>
+    </div>
+    
+    <div class="cards">
+      <a href="/viewer" class="card">
+        <div class="card-icon">🗺️</div>
+        <h2>View Orthomosaics</h2>
+        <p>Interactive web viewer for exploring your Cloud Optimized GeoTIFF files with high-zoom capabilities</p>
+        <span class="button">Launch Viewer</span>
+      </a>
+      
+      <a href="/converter" class="card">
+        <div class="card-icon">⚡</div>
+        <h2>Convert to COG</h2>
+        <p>Transform standard GeoTIFF files into Cloud Optimized format for fast web viewing</p>
+        <span class="button">Open Converter</span>
+      </a>
+      
+      <a href="/docs" class="card">
+        <div class="card-icon">📚</div>
+        <h2>API Documentation</h2>
+        <p>Explore the REST API endpoints and integrate with your workflow</p>
+        <span class="button">View Docs</span>
+      </a>
+    </div>
+    
+    <div class="features">
+      <h3>✨ Features</h3>
+      <div class="features-grid">
+        <div class="feature-item">
+          <h4>🔄 Auto-Discovery</h4>
+          <p>Automatically detects COG files in your data directory</p>
+        </div>
+        <div class="feature-item">
+          <h4>🚀 Fast Streaming</h4>
+          <p>TiTiler-powered dynamic tile generation for instant viewing</p>
+        </div>
+        <div class="feature-item">
+          <h4>🎯 High Zoom</h4>
+          <p>Zoom up to 2000x for pixel-level inspection</p>
+        </div>
+        <div class="feature-item">
+          <h4>📦 Batch Processing</h4>
+          <p>Convert multiple orthomosaics simultaneously</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>Structure from Motion Orthomosaic Tile Viewer</p>
+    </div>
+  </div>
+</body>
+</html>

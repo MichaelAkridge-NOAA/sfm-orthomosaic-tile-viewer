@@ -1,0 +1,20 @@
+services:
+  orthomosaic-viewer:
+    build: .
+    image: michaelakridge326/sfm-tile-ortho-viewer:latest
+    container_name: sfm-ortho-viewer
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount your local data directory containing COG files
+      - ./data:/app/data
+      # Mount config for easy changes without rebuild
+      - ./config.yaml:/app/config.yaml
+      # Optional: Mount code for development (hot reload)
+      # - ./main.py:/app/main.py
+      # - ./web:/app/web
+      # - ./scripts:/app/scripts
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
