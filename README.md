@@ -2,13 +2,14 @@
 
 A lightweight web-based viewer for visualizing large Structure from Motion (SfM) orthomosaics using Cloud Optimized GeoTIFFs (COG), TiTiler, and Leaflet.
 
-## Features
+<img src="./docs/s01.png" />
 
+## Features
 - **Orthomosaic Viewer**: Clean web interface optimized for viewing photogrammetry outputs
 - **Auto-Discovery**: Automatically detects and lists COG files in the data directory
 - **COG Conversion**: Convert standard GeoTIFFs to COG format (single or batch)
 - **Fast Tile Server**: TiTiler-based FastAPI server with dynamic tile generation
-<img src="./docs/s01.png" />
+
 
 ## Ortho Viewer
 <img src="./docs/s02.png" />
