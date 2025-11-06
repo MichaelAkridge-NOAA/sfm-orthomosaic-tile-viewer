@@ -13,13 +13,13 @@ A lightweight web-based viewer for visualizing large Structure from Motion (SfM)
 Traditional GeoTIFF               Cloud Optimized GeoTIFF
 ─────────────────                ─────────────────────────
                                  
-┌─────────────────┐              ┌───┬───┬───┬───┐
-│                 │              │ T │ I │ L │ E │
-│   Must Download │              ├───┼───┼───┼───┤
-│   Entire File   │              │ S │   │   │   │
-│   (500 MB)      │              ├───┼───┼───┼───┤
-│                 │              │ + │Overviews  │
-│                 │              ├───┴───┴───┴───┤
+┌─────────────────┐              ┌───┬───┬───┬────┐
+│                 │              │ T │ I │ L │ E  │
+│   Must Download │              ├───┼───┼───┼────┤
+│   Entire File   │              │ S │   │   │    │
+│   (500 MB)      │              ├───┼───┼───┼────┤
+│                 │              │ + │Overviews   │
+│                 │              ├───┴───┴───┴────┤
 └─────────────────┘              │Stream on Demand│
                                  └────────────────┘
      ❌ Slow                           ✅ Fast
