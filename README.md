@@ -9,7 +9,21 @@ A lightweight web-based viewer for visualizing large Structure from Motion (SfM)
 - **Auto-Discovery**: Automatically detects and lists COG files in the data directory
 - **COG Conversion**: Convert standard GeoTIFFs to COG format (single or batch)
 - **Fast Tile Server**: TiTiler-based FastAPI server with dynamic tile generation
-
+```
+Traditional GeoTIFF               Cloud Optimized GeoTIFF
+─────────────────                ─────────────────────────
+                                 
+┌─────────────────┐              ┌───┬───┬───┬───┐
+│                 │              │ T │ I │ L │ E │
+│   Must Download │              ├───┼───┼───┼───┤
+│   Entire File   │              │ S │   │   │   │
+│   (500 MB)      │              ├───┼───┼───┼───┤
+│                 │              │ + │Overviews  │
+│                 │              ├───┴───┴───┴───┤
+└─────────────────┘              │Stream on Demand│
+                                 └────────────────┘
+     ❌ Slow                           ✅ Fast
+```
 
 ## Ortho Viewer
 <img src="./docs/s02.png" />
@@ -17,6 +31,9 @@ A lightweight web-based viewer for visualizing large Structure from Motion (SfM)
 
 ## DEM Viewer
 <img src="./docs/s04.png" />
+
+## Ortho/DEM GeoTiff to COG Web Convter
+<img src="./docs/s05.png" />
 
 ## Quick Start
 
@@ -75,7 +92,38 @@ uvicorn main:app --reload
 ```
 
 ## Workflow
-
+```
+┌─────────────────┐
+│  GeoTIFF File   │
+│   (Original)    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   make_cog.py   │
+│  (Conversion)   │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  COG File       │
+│  ├─ Tiles       │
+│  ├─ Overviews   │
+│  └─ Metadata    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  TiTiler Server │
+│  (FastAPI)      │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  Leaflet Map    │
+│  (Web Viewer)   │
+└─────────────────┘
+```
 ### Step 1: Convert Orthomosaics to COG Format
 
 Transform your SfM-generated orthomosaics into Cloud Optimized GeoTIFFs for efficient web viewing.
