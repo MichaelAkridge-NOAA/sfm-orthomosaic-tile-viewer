@@ -9,6 +9,15 @@ A lightweight web-based viewer for visualizing large Structure from Motion (SfM)
 - **COG Conversion**: Convert standard GeoTIFFs to COG format (single or batch)
 - **Fast Tile Server**: TiTiler-based FastAPI server with dynamic tile generation
 <img src="./docs/s01.png" />
+
+## Ortho Viewer
+<img src="./docs/s02.png" />
+<img src="./docs/s03.png" />
+
+## DEM Viewer
+<img src="./docs/s04.png" />
+
+
 ## Quick Start
 
 ### Using Docker 
