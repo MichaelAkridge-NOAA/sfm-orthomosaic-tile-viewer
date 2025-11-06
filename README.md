@@ -1,4 +1,4 @@
-# SfM Orthomosaic Tile Viewer
+# SfM Orthomosaic & DEM Tile Viewer
 
 A lightweight web-based viewer for visualizing large Structure from Motion (SfM) orthomosaics using Cloud Optimized GeoTIFFs (COG), TiTiler, and Leaflet.
 
